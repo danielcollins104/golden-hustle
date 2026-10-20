@@ -101,7 +101,7 @@ function spinOutcome(bet){
   const targets=[]; for(let c=0;c<RC;c++) targets.push(targetFor(c,pl));
   const res=evaluate(gridFrom(targets),bet);
   let bonusAward=0;
-  if(res.stars>=3 && !res.wheel) bonusAward=3*bet;   // SC mode: bonus doors become a flat server award (v1)
+  if(res.stars>=3 && !res.wheel) bonusAward=2*bet;   // SC mode: bonus doors become a flat server award (v1)
   return { targets, pl:{mode:pl.mode}, total:res.total, lines:res.lines,
            scatters:res.scatters, stars:res.stars, wheel:res.wheel, bonusAward };
 }
