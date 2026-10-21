@@ -6,6 +6,11 @@
 <title>Golden Hustle — Street Royale · Engine v3 (Phaser)</title>
 <style>
 body{margin:0;background:#05030c url('assets/backdrop.jpg') center/cover no-repeat fixed;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+#dhx .fximg{position:absolute;left:50%;top:50%;width:130%;transform:translate(-50%,-50%) scale(.4);opacity:0;pointer-events:none;z-index:28}
+#dhx .fximg.go{animation:fxpop 1.1s ease-out forwards}
+@keyframes fxpop{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}70%{opacity:.9;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.08)}}
+#dhx video.animv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:32;display:none;pointer-events:none;border-radius:14px}
+#dhx #bannerImg{width:88%;max-width:560px;margin:0 auto;display:none}
 </style>
 </head>
 <body>
@@ -204,7 +209,7 @@ body{margin:0;background:#05030c url('assets/backdrop.jpg') center/cover no-repe
     
     <svg class="winlines" id="winlines"></svg>
     <div class="soclose" id="soclose"><span></span></div>
-    <div class="banner" id="banner"><div class="big"></div><div class="amt"></div></div>
+    <div class="banner" id="banner"><img id="bannerImg"><div class="big"></div><div class="amt"></div></div>
   </div>
   <div class="fsbadge" id="fsbadge"></div>
   <div class="ladder" id="ladder"><span class="lab" id="ladderLab"></span></div>
@@ -274,6 +279,11 @@ body{margin:0;background:#05030c url('assets/backdrop.jpg') center/cover no-repe
     </div>
     <button class="cta" id="rulesClose" style="margin-top:12px">Close</button>
   </div>
+  <img id="fxBurst" class="fximg" src="assets/fx/coin-burst.png" alt="">
+  <img id="fxBoom" class="fximg" src="assets/fx/explosion.png" alt="">
+  <video id="animWin" class="animv" src="assets/anim/anim_big_win.mp4" playsinline preload="none"></video>
+  <video id="animFS" class="animv" src="assets/anim/anim_free_spins.mp4" playsinline preload="none"></video>
+  <video id="animBonus" class="animv" src="assets/anim/anim_bonus_intro.mp4" playsinline preload="none"></video>
   <div class="overlay" id="brokeOverlay"><h2 id="brokeTitle"></h2><p id="brokeSub"></p><button class="cta" id="refillBtn"></button></div>
   <div class="toast" id="toast"></div>
 </div>
