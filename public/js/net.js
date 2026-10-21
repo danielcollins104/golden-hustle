@@ -77,34 +77,26 @@ async function netSpin(){
     GH.main.stopPulse(RC-1);
     settle(o);
   }
-  function animateReel(i2,d2,onDone){
-    var cont=GH.reelCont[i2], from=cont.y, to=-GH.pos[i2]*CH, t0=performance.now();
-    function frame(t){
-      if(finished)return;
-      var k=Math.min(1,(t-t0)/d2), e2=1-Math.pow(1-k,3);
-      cont.y=from+(to-from)*e2;
-      if(k<1){ requestAnimationFrame(frame); } else { cont.y=to; onDone(); }
-    }
-    requestAnimationFrame(frame);
-  }
   GH.reelCont.forEach(function(cont,i){
     var cur=GH.pos[i];
     var delta=((targets[i]-cur)%STRIPLEN+STRIPLEN)%STRIPLEN;
     if(!isFinite(delta))delta=0;
     GH.pos[i]=cur+STRIPLEN*2+delta;
-    animateReel(i,dur[i],function(){
-      if(finished)return;
-      GH.audio.stop(); GH.buzz(i===RC-1?'lastReel':'reelStop'); done++;
-      if(done===RC)finish();
-    });
+    GH.main.tweens.add({targets:cont,y:-GH.pos[i]*CH,duration:dur[i],ease:'Cubic.Out',
+      onComplete:function(){
+        if(finished)return;
+        GH.audio.stop(); GH.buzz(i===RC-1?'lastReel':'reelStop'); done++;
+        if(done===RC)finish();
+      }});
   });
-  /* NaN watchdog: if Phaser loses a reel mid-tween, snap it to its server target */
+  /* completion watchdog: heal NaN reels for display; force settle once every
+     reel has exceeded its duration + slack (covers Phaser tween NaN) */
+  var reelStart=Date.now(), maxDur=Math.max.apply(null,dur)+800;
   var wd=setInterval(function(){
-    var bad=false;
-    GH.reelCont.forEach(function(ct,ci){ if(isNaN(ct.y)){ ct.y=-targets[ci]*CH; GH.pos[ci]=targets[ci]; bad=true; } });
-    if(bad||finished){ clearInterval(wd); if(bad)finish(); }
-  },120);
-  setTimeout(function(){ clearInterval(wd); finish(); }, Math.max.apply(null,dur)+3000);
+    if(finished){ clearInterval(wd); return; }
+    GH.reelCont.forEach(function(ct,ci){ if(isNaN(ct.y)){ ct.y=-targets[ci]*CH; } });
+    if(Date.now()-reelStart>maxDur){ clearInterval(wd); finish(); }
+  },140);
 }
 
 function settle(o){
