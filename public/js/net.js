@@ -69,21 +69,33 @@ async function netSpin(){
     setTimeout(function(){GH.audio.heart();GH.buzz('anticipation')},dur[RC-1]-700);
   }
   GH.audio.spin();
-  var done=0;
+  var done=0, finished=false;
+  function finish(){
+    if(finished)return; finished=true;
+    GH.reelCont.forEach(function(ct,ci){ GH.pos[ci]=targets[ci]; ct.y=-targets[ci]*CH; });
+    GH.main.endSmear();
+    GH.main.stopPulse(RC-1);
+    settle(o);
+  }
   GH.reelCont.forEach(function(cont,i){
     var cur=GH.pos[i];
     var delta=((targets[i]-cur)%STRIPLEN+STRIPLEN)%STRIPLEN;
+    if(!isFinite(delta))delta=0;
     GH.pos[i]=cur+STRIPLEN*2+delta;
     GH.main.tweens.add({targets:cont,y:-GH.pos[i]*CH,duration:dur[i],ease:'Cubic.Out',
       onComplete:function(){
+        if(finished)return;
         GH.audio.stop(); GH.buzz(i===RC-1?'lastReel':'reelStop'); done++;
-        if(done===RC){
-          GH.reelCont.forEach(function(ct,ci){GH.pos[ci]%=STRIPLEN;ct.y=-GH.pos[ci]*CH});
-          GH.main.stopPulse(RC-1);
-          settle(o);
-        }
+        if(done===RC)finish();
       }});
   });
+  /* NaN watchdog: if Phaser loses a reel mid-tween, snap it to its server target */
+  var wd=setInterval(function(){
+    var bad=false;
+    GH.reelCont.forEach(function(ct,ci){ if(isNaN(ct.y)){ ct.y=-targets[ci]*CH; GH.pos[ci]=targets[ci]; bad=true; } });
+    if(bad||finished){ clearInterval(wd); if(bad)finish(); }
+  },120);
+  setTimeout(function(){ clearInterval(wd); finish(); }, Math.max.apply(null,dur)+3000);
 }
 
 function settle(o){
