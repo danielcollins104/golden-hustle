@@ -4,7 +4,7 @@ window.GH = window.GH || {};
 
 GH.CFG = {
   meta: {
-    title:'GOLDEN HUSTLE', subtitle:'STREET ROYALE',
+    title:'GOLDEN HUSTLE', subtitle:'BLACKLIGHT EDITION',
     ladderLabel:'STREAK ×', hypeLabel:'HYPE',
     brokeTitle:'OUT OF CREDITS', brokeSub:'The hustle never stops — but your balance did.',
     brokeButton:'Refill 1,000',
@@ -15,16 +15,16 @@ GH.CFG = {
     tile1:'#2d1b47', tile2:'#160b28',
   },
   symbols: [
-    { key:'diamond', name:'king',     tex:'king',     emoji:'👑', weight:1, wild:true,  pay:{3:15,4:38,5:150} },
-    { key:'rocket',  name:'sword',    tex:'sword',    emoji:'🗡️', weight:2,             pay:{3:11,4:30,5:112} },
-    { key:'moon',    name:'queen',    tex:'queen',    emoji:'📿', weight:2,             pay:{3:8,4:19,5:60}  },
-    { key:'ape',     name:'lion',     tex:'lion',     emoji:'🦁', weight:2,             pay:{3:6,4:15,5:45}  },
-    { key:'ufo',     name:'ocean',    tex:'ocean',    emoji:'⛵', weight:1,             pay:{3:4,4:11,5:30}  },
-    { key:'banana',  name:'warrior',  tex:'warrior',  emoji:'🥷', weight:3,             pay:{3:4,4:9,5:26}  },
-    { key:'dog',     name:'princess', tex:'princess', emoji:'👸', weight:4,             pay:{3:3,4:6,5:19}  },
-    { key:'crash',   name:'camel',    tex:'camel',    emoji:'🐪', weight:4,             pay:{3:2,4:4,5:15}  },
-        { key:'poop',    name:'genie',    tex:'genie',    emoji:'🧞', weight:2,             pay:{3:6,4:15,5:45}  },
-    { key:'star',    name:'treasure', tex:'treasure', emoji:'💰', weight:2,             pay:null              },
+    { key:'diamond', name:'wild',      tex:'wild',     emoji:'🔥', weight:1, wild:true,  pay:{3:15,4:38,5:150} },
+    { key:'rocket',  name:'turntable', tex:'turntable',emoji:'🎚️', weight:2,             pay:{3:11,4:30,5:112} },
+    { key:'moon',    name:'boombox',   tex:'boombox',  emoji:'📻', weight:2,             pay:{3:8,4:19,5:60}  },
+    { key:'ape',     name:'headphones',tex:'headphones',emoji:'🎧', weight:2,             pay:{3:6,4:15,5:45}  },
+    { key:'ufo',     name:'bolt',      tex:'bolt',     emoji:'⚡', weight:1,             pay:{3:4,4:11,5:30}  },
+    { key:'banana',  name:'vinyl',     tex:'vinyl',    emoji:'💿', weight:3,             pay:{3:4,4:9,5:26}  },
+    { key:'dog',     name:'seven',     tex:'seven',    emoji:'7️⃣', weight:4,             pay:{3:3,4:6,5:19}  },
+    { key:'crash',   name:'microphone',tex:'microphone',emoji:'🎤', weight:4,             pay:{3:2,4:4,5:15}  },
+        { key:'poop',    name:'spraycan',  tex:'spraycan', emoji:'🧲', weight:2,             pay:{3:6,4:15,5:45}  },
+    { key:'star',    name:'gem',       tex:'gem',      emoji:'💎', weight:2,             pay:null              },
   ],
   reels: {
     count:5, rows:3, cellHeight:68, tile:68, reelW:76, gap:6,
