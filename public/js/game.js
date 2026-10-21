@@ -259,9 +259,9 @@ MainScene.prototype={
 };
 
 /* ── spin flow ── */
-function spin(){
+function spin(serverTargets,serverRes){
   if(GH.state.spinning||spinLock)return;
-  if(GH.net&&GH.net.spin){GH.net.spin();return}
+  if(GH.net&&GH.net.spin&&!serverTargets){GH.net.spin();return}
   if(GH.state.fs===0&&GH.state.bal<GH.state.bet){el.brokeOverlay.classList.add('show');return}
   GH.audio.ac(); GH.startMusic(); GH.buzz('spin');
   GH.state.spinning=true; GH.main.clearWin();
@@ -272,8 +272,9 @@ function spin(){
   GH.state.spins++; GH.state.sinceGift++;
   CFG.jackpots.levels.forEach(function(l){GH.jack[l.key]+=GH.state.bet*l.growth});
   GH.audio.spin();
-  var pl=GH.plan();
-  var targets=[]; for(var c=0;c<RC;c++)targets.push(GH.targetFor(c,pl,GH.strips));
+  var pl,targets;
+  if(serverTargets){ GH.pendingServer=serverRes; pl={mode:(serverRes&&serverRes.mode)||'normal'}; targets=serverTargets; }
+  else{ pl=GH.plan(); targets=[]; for(var c=0;c<RC;c++)targets.push(GH.targetFor(c,pl,GH.strips)); }
   var dur=CFG.reels.spinDurations.slice();
   if(GH.state.turbo)dur=dur.map(function(d){return d*CFG.reels.turboFactor});
 
@@ -343,7 +344,32 @@ function bigCelebration(text,win){
   setTimeout(function(){rain(120)},600);
 }
 
+function applyServer(o){
+  var st=GH.state;
+  st.lastWin=o.win;
+  if(o.win>st.biggest)st.biggest=o.win;
+  st.hype=Math.min(CFG.hype.max,st.hype+CFG.hype.perSpin+(o.win>0?CFG.hype.perWin:0));
+  st.spins++; st.sinceGift++;
+  var res={total:o.win,lines:o.lines||[],scatters:o.scatters,stars:o.stars,wheel:o.wheel,grid:GH.gridFrom(o.targets,GH.strips)};
+  if(o.win>0)celebrate(o.win,res);
+  else if(o.mode&&o.mode!=='normal'){ snd.wah(); shake(); buzz('nearMiss');
+    el.soclose.querySelector('span').textContent=o.mode==='soclose'?'SO CLOSE!':'ONE SHIP AWAY!';
+    el.soclose.classList.add('show');
+    setTimeout(function(){el.soclose.classList.remove('show')},2000); }
+  if(o.wheel&&o.wheelPrize)bigCelebration(o.wheelPrize.key.toUpperCase()+' JACKPOT',o.wheelPrize.amount);
+  if(o.bonusAward>0){ snd.big(); toast('\u2B50 Bonus award +$'+fmt(o.bonusAward)+' credited'); }
+  if(o.fsGrant){ snd.fanfare(); toast('\u26F5 +'+o.fsGrant.n+' FREE SPINS \u00D7'+o.fsGrant.m); }
+  if(GH.pendingSync){ var u=GH.pendingSync.user; st.gcBalance=u.gc; st.scBalance=u.sc;
+    if(GH.pendingSync.mode==='sc'){st.bal=u.sc;st.fs=u.fsSc}else{st.bal=u.gc;st.fs=u.fsGc}
+    st.fsMult=u.fsMult||1;
+    if(GH.pendingSync.jack)Object.keys(GH.pendingSync.jack).forEach(function(k){GH.jack[k]=GH.pendingSync.jack[k]});
+    GH.pendingSync=null; }
+  st.spinning=false;
+  updateUI();
+  if(st.fs>0){setTimeout(function(){if(st.fs>0&&!st.spinning)spin()},1400)}
+}
 function resolveSpin(pl,inFS){
+  if(GH.pendingServer){applyServer(GH.pendingServer);GH.pendingServer=null;return}
   var res=GH.evaluate(GH.gridFrom(GH.pos,GH.strips));
   var mult=GH.LADDER[Math.min(Math.max(GH.state.streak,0),GH.LADDER.length-1)];
   var fsM=inFS?GH.state.fsMult:1;
@@ -616,7 +642,11 @@ function fitScreen(){
             : Math.min(1,(window.innerWidth-4)/fw);
   fitEl.style.zoom=s;
 }
-window.addEventListener('resize',fitScreen);
+var __lw=window.innerWidth,__lh=window.innerHeight;
+window.addEventListener('resize',function(){
+  if(Math.abs(window.innerWidth-__lw)<10&&Math.abs(window.innerHeight-__lh)<60)return;
+  __lw=window.innerWidth;__lh=window.innerHeight;fitScreen();
+});
 window.addEventListener('orientationchange',function(){setTimeout(fitScreen,250)});
 fitScreen();
 
