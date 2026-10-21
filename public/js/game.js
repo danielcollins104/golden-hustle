@@ -163,7 +163,7 @@ MainScene.prototype={
       mx.fillStyle(0xffffff); mx.fillRect(c*(RW+GAP),0,RW,SCENE_H);
       var mask=mx.createGeometryMask();
       var cont=this.add.container(c*(RW+GAP)+RW/2, -GH.pos[c]*CH);
-      var n=3*GH.STRIPLEN+3;
+      var n=4*GH.STRIPLEN+3;
       for(var k=0;k<n;k++){
         var key=GH.strips[c][k%GH.STRIPLEN];
         var sp=this.add.image(0,k*CH,SYM[key].tex).setDisplaySize(TILE,TILE);
@@ -178,7 +178,36 @@ MainScene.prototype={
     }
     GH.lineGfx=this.add.graphics().setDepth(8);
     GH.winFx=[];
+    /* reel motion-blur: stretched transparent copies of passing tiles */
+    GH.smear=[]; GH.lastY=[];
+    for(var s2=0;s2<RC;s2++){
+      var arr=[];
+      for(var r2=0;r2<ROWS;r2++){
+        var sp=this.add.image(s2*(RW+GAP)+RW/2,r2*CH+CH/2,'king').setDepth(4).setAlpha(0).setVisible(false);
+        arr.push(sp);
+      }
+      GH.smear.push(arr); GH.lastY.push(GH.reelCont[s2].y);
+    }
     updateUI();
+  },
+  update:function(){
+    if(!GH.state||!GH.state.spinning)return;
+    for(var i=0;i<RC;i++){
+      var cont=GH.reelCont[i], y=cont.y;
+      var vel=Math.min(1.9,Math.abs(y-GH.lastY[i])/14);
+      GH.lastY[i]=y;
+      var base=Math.round(-y/CH);
+      for(var r2=0;r2<ROWS;r2++){
+        var sp=GH.smear[i][r2], idx=base+r2, tile=cont.list[idx];
+        if(!tile||idx<0||idx>=cont.list.length||vel<0.12){sp.setAlpha(0);continue}
+        sp.setTexture(tile.texture.key).setDisplaySize(TILE,TILE*(1.15+vel*1.1));
+        sp.setY(r2*CH+CH/2).setAlpha(0.38).setVisible(true);
+      }
+    }
+  },
+  endSmear:function(){
+    if(!GH.smear)return;
+    GH.smear.forEach(function(arr){arr.forEach(function(sp){sp.setAlpha(0)})});
   },
   drawWinLines:function(wins){
     var t=GH.main, g=GH.lineGfx; g.clear();
@@ -259,6 +288,7 @@ function spin(){
         if(done===RC){
           GH.reelCont.forEach(function(ct,ci){ GH.pos[ci]%=GH.STRIPLEN; ct.y=-GH.pos[ci]*CH; });
           GH.main.stopPulse(RC-1);
+          GH.main.endSmear();
           resolveSpin(pl,inFS);
         }
       }});
@@ -563,6 +593,13 @@ function fitScreen(){
 window.addEventListener('resize',fitScreen);
 window.addEventListener('orientationchange',function(){setTimeout(fitScreen,250)});
 fitScreen();
+
+/* belt-and-braces: ensure reel box has height even if CSS is stale/cached */
+var forceReelBox=function(){ var rw=document.getElementById('reelwrap');
+  if(rw) rw.style.height=(window.innerWidth>window.innerHeight)?'216px':'224px'; };
+window.addEventListener('resize',forceReelBox);
+window.addEventListener('orientationchange',function(){setTimeout(forceReelBox,250)});
+forceReelBox();
 
 /* exposed for net.js (sweepstakes mode) */
 GH.api={spin:spin,updateUI:updateUI,award:award,fmt:fmt,fmt2:fmt2,toast:toast,showBanner:showBanner,shake:shake,
