@@ -204,6 +204,8 @@ MainScene.prototype={
     updateUI();
   },
   update:function(){
+    for(var ci2=0;ci2<GH.reelCont.length;ci2++){ var ct2=GH.reelCont[ci2];
+      if(isNaN(ct2.y)){ var p2=isFinite(GH.pos[ci2])?GH.pos[ci2]:0; ct2.y=-p2*GH.CH; } }
     if(!GH.state||!GH.state.spinning)return;
     for(var i=0;i<RC;i++){
       var cont=GH.reelCont[i], y=cont.y;
@@ -222,7 +224,7 @@ MainScene.prototype={
   },
   endSmear:function(){
     if(!GH.smear)return;
-    GH.smear.forEach(function(arr){arr.forEach(function(sp){sp.setAlpha(0)})});
+    GH.smear.forEach(function(arr){(arr||[]).forEach(function(sp){sp&&sp.setAlpha(0)})});
   },
   drawWinLines:function(wins){
     var t=GH.main, g=GH.lineGfx; g.clear();
@@ -242,13 +244,16 @@ MainScene.prototype={
     GH.winFx.forEach(function(f){f.destroy()}); GH.winFx=[];
   },
   pulse:function(idx,which){
-    var sp=(which==='cresc'?GH.crescFx:GH.anticFx)[idx];
+    var arr=(which==='cresc'?GH.crescFx:GH.anticFx);
+    if(!arr||!arr[idx])return;
+    var sp=arr[idx];
     sp.setAlpha(1);
     GH.pulseTweens[idx]=this.tweens.add({targets:sp,alpha:0.25,duration:which==='cresc'?160:300,yoyo:true,repeat:-1});
   },
   stopPulse:function(idx){
-    if(GH.pulseTweens[idx]){GH.pulseTweens[idx].remove();GH.pulseTweens[idx]=null}
-    GH.anticFx[idx].setAlpha(0); GH.crescFx[idx].setAlpha(0);
+    if(GH.pulseTweens&&GH.pulseTweens[idx]){GH.pulseTweens[idx].remove();GH.pulseTweens[idx]=null}
+    if(GH.anticFx&&GH.anticFx[idx])GH.anticFx[idx].setAlpha(0);
+    if(GH.crescFx&&GH.crescFx[idx])GH.crescFx[idx].setAlpha(0);
   }
 };
 
