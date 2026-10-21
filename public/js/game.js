@@ -195,7 +195,6 @@ MainScene.prototype={
     GH.smear=[]; GH.lastY=[];
     for(var s2=0;s2<RC;s2++){
       var arr=[];
-      if(!GH.smear||!GH.smear[i])continue;
       for(var r2=0;r2<ROWS;r2++){
         var sp=this.add.image(s2*(RW+GAP)+RW/2,r2*CH+CH/2,'king').setDepth(4).setAlpha(0).setVisible(false);
         arr.push(sp);
@@ -211,8 +210,10 @@ MainScene.prototype={
       var vel=Math.min(1.9,Math.abs(y-GH.lastY[i])/14);
       GH.lastY[i]=y;
       var base=Math.round(-y/CH);
+      var sm=GH.smear&&GH.smear[i]; if(!sm)continue;
       for(var r2=0;r2<ROWS;r2++){
-        var sp=GH.smear[i][r2], idx=base+r2, tile=cont.list[idx];
+        var sp=sm[r2]; if(!sp)continue;
+        var idx=base+r2, tile=cont.list[idx];
         if(!tile||idx<0||idx>=cont.list.length||vel<0.12){sp.setAlpha(0);continue}
         sp.setTexture(tile.texture.key).setDisplaySize(TILE,TILE*(1.15+vel*1.1));
         sp.setY(r2*CH+CH/2).setAlpha(0.38).setVisible(true);
