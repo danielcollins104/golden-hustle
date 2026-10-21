@@ -27,3 +27,11 @@ How to rebuild, re-skin, and extend this sweepstakes slot from scratch. Verified
 - Demo instance: `node server.js` + `cloudflared tunnel --url localhost:PORT` (ephemeral; sandbox resets kill bg processes — boot per session).
 - Deploy: Railway/Render from this repo; env ADMIN_KEY; volume for server/data.json.
 - Admin: GET/POST /api/admin/* with x-admin-key header.
+
+
+## FINAL tile styling recipe (v2.1, user-approved)
+Dark field: per-symbol hue at HLS L 9-16% (near-black, whisper of color) + soft top lift.
+Colored identity ring: hsl(hue,85,60), 5px, blurred glow copy beneath.
+Subject: luminance-keyed alpha ((L-12)*4) from pure-black-source art.
+Outline: SILHOUETTE-ONLY — rim mask = FIND_EDGES(>80) MULTIPLIED BY (alpha minus MinFilter(11)-eroded alpha). Soft halo 20% + rim line 120-alpha white. NO internal edge outlining.
+Quantize 192 colors FASTOCTREE. Size 192px. Display 68px tiles.
