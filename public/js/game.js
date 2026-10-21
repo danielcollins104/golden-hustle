@@ -70,6 +70,19 @@ el.hapticBtn.addEventListener('click',function(){
 });
 
 /* ── helpers ── */
+function fxFlash(id){
+  var el2=document.getElementById(id); if(!el2)return;
+  el2.classList.remove('go'); void el2.offsetWidth; el2.classList.add('go');
+}
+function playAnim(id,onDone){
+  var v=document.getElementById(id); if(!v||!v.src){ if(onDone)onDone(); return false }
+  v.style.display='block'; v.currentTime=0;
+  var p=v.play(); if(p&&p.catch)p.catch(function(){});
+  v.onended=function(){ v.style.display='none'; v.onended=null; if(onDone)onDone(); };
+  setTimeout(function(){ if(v.style.display==='block'){ v.style.display='none'; if(onDone)onDone(); } },9000);
+  return true;
+}
+window.fxFlash=fxFlash; window.playAnim=playAnim;
 function fmt(n){return Math.round(n).toLocaleString('en-US')}
 function fmt2(n){return (Math.round(n*100)/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
 function toast(msg){el.toast.textContent=msg;el.toast.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(function(){el.toast.classList.remove('show')},2200)}
@@ -182,6 +195,7 @@ MainScene.prototype={
     GH.smear=[]; GH.lastY=[];
     for(var s2=0;s2<RC;s2++){
       var arr=[];
+      if(!GH.smear||!GH.smear[i])continue;
       for(var r2=0;r2<ROWS;r2++){
         var sp=this.add.image(s2*(RW+GAP)+RW/2,r2*CH+CH/2,'king').setDepth(4).setAlpha(0).setVisible(false);
         arr.push(sp);
@@ -312,7 +326,12 @@ function celebrate(win,res){
   setTimeout(fxKick,10);
 }
 function bigCelebration(text,win){
-  showBanner(text,win,'gold');
+  var bi=document.getElementById('bannerImg');
+  if(bi){ bi.src='assets/fx/banner-mega-win.png'; bi.style.display='block';
+    el.banner.className='banner show gold'; el.banner.querySelector('.big').textContent=''; el.banner.querySelector('.amt').textContent='+$'+fmt(win);
+    clearTimeout(bigCelebration.t); bigCelebration.t=setTimeout(function(){bi.style.display='none'},2800); }
+  else showBanner(text,win,'gold');
+  fxFlash('fxBurst');
   var n=0,iv=setInterval(function(){centerBurst(25);GH.audio.coin();GH.buzz('coin');if(++n>6)clearInterval(iv)},280);
   setTimeout(function(){rain(120)},600);
 }
