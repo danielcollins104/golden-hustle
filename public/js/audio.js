@@ -3,6 +3,29 @@
 var CFG=GH.CFG;
 var AC=null;
 function ac(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){} } if(AC&&AC.state==='suspended')AC.resume(); return AC; }
+/* ── real casino SFX (Kenney, CC0) with synth fallback ── */
+var SFX_DEFS={spin:'spin',stop:'stop',stopLast:'stopLast',coin:'coin',stack:'stack',click:'click'};
+var sfxBuf={}, sfxLoading=false;
+function loadSamples(){
+  if(sfxLoading)return; sfxLoading=true;
+  var a2=ac(); if(!a2)return;
+  Object.keys(SFX_DEFS).forEach(function(name){
+    var url=(GH.SFX64&&GH.SFX64[name])||('assets/sfx/'+name+'.ogg');
+    fetch(url).then(function(r){return r.arrayBuffer()}).then(function(buf){return a2.decodeAudioData(buf)})
+      .then(function(dec){sfxBuf[name]=dec}).catch(function(){});
+  });
+}
+function playSfx(name,vol,rate){
+  if(GH.state.muted||!CFG.audio.enabled)return;
+  var b=sfxBuf[name]; if(!b)return false;
+  var a2=ac(); if(!a2)return false;
+  var src=a2.createBufferSource(),g=a2.createGain();
+  src.buffer=b; src.playbackRate.value=rate||(0.94+Math.random()*0.12);
+  g.gain.value=(vol||0.5)*CFG.audio.volume;
+  src.connect(g); g.connect(a2.destination); src.start();
+  return true;
+}
+
 function tone(f,d,type,v,when,slide){
   if(GH.state.muted||!CFG.audio.enabled)return; var a=ac(); if(!a)return;
   var o=a.createOscillator(),g=a.createGain(); o.type=type||'square';
@@ -17,8 +40,8 @@ function semiF(base,semi){ return base*Math.pow(2,semi/12); }
 
 GH.audio={
   ac:ac,
-  spin:function(){tone(180,0.5,'sawtooth',0.03,0,420)},
-  stop:function(){tone(140,0.12,'square',0.08);tone(90,0.15,'sine',0.1)},
+  spin:function(){ if(!playSfx('spin',0.5)) tone(180,0.5,'sawtooth',0.03,0,420) },
+  stop:function(last){ if(!playSfx(last?'stopLast':'stop',last?0.7:0.5)) {tone(140,0.12,'square',0.08);tone(90,0.15,'sine',0.1)} },
   tick:function(){tone(1200,0.03,'square',0.02)},
   jiggle:function(n){var s=curScheme();for(var i=0;i<n;i++){var semi=s.scale[i%s.scale.length]+12*Math.floor(i/s.scale.length);tone(semiF(s.base,semi),0.16,s.wave,0.07,i*s.tempo)}},
   chord:function(when){var s=curScheme();[0,4,7,12].forEach(function(st,i){tone(semiF(s.base,st),0.8,s.wave,0.045,(when||0)+i*0.03)})},
@@ -26,7 +49,9 @@ GH.audio={
   nice:function(){GH.audio.jiggle(6)},
   big:function(){var s=curScheme();GH.audio.jiggle(8);GH.audio.chord(8*s.tempo)},
   fanfare:function(){var s=curScheme();GH.audio.jiggle(12);GH.audio.chord(12*s.tempo)},
-  coin:function(){var s=curScheme();tone(s.coin[0],0.08,s.wave,0.04);tone(s.coin[1],0.12,s.wave,0.04,0.07)},
+  coin:function(){ if(!playSfx('coin',0.5)) {var s=curScheme();tone(s.coin[0],0.08,s.wave,0.04);tone(s.coin[1],0.12,s.wave,0.04,0.07)} },
+  stack:function(){ playSfx('stack',0.55) },
+  click:function(){ playSfx('click',0.4) },
   wah:function(){tone(420,0.55,'sawtooth',0.05,0,110)},
   heart:function(){tone(70,0.1,'sine',0.12);tone(70,0.1,'sine',0.1,0.18)},
   rise:function(step){var s=curScheme();var semi=s.scale[step%s.scale.length]+12*Math.floor(step/s.scale.length);tone(semiF(s.base,semi),0.14,s.wave,0.07)},
