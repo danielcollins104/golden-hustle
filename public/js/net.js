@@ -38,67 +38,16 @@ function syncModeBtn(){ var b=$('curBtn'); b.textContent=mode==='sc'?'SC':'GC'; 
 async function netSpin(){
   var st=GH.state;
   if(st.spinning||busy)return;
-  if(st.fs===0&&bal()<st.bet){ GH.api.toast('Insufficient '+(mode==='sc'?'SC':'GC')+' — tap GC/SC for options'); return }
+  if(st.fs===0&&bal()<st.bet){ GH.api.toast('Insufficient '+(mode==='sc'?'SC':'GC')); return }
   busy=true;
-  GH.audio.ac(); GH.startMusic(); GH.buzz('spin');
   var r;
   try{ r=await api('/api/spin',{mode:mode,bet:st.bet}); }
   catch(e){ busy=false; GH.api.toast(e.message); return }
   var o=r.outcome;
-  lastTargets=o.targets;
-  st.spinning=true; GH.main.clearWin();
-  $('banner').className='banner'; $('soclose').classList.remove('show');
-  syncUser(r.user,r.jackpots);
-
-  var targets=o.targets;
-  var dur=CFG.reels.spinDurations.slice();
-  if(st.turbo)dur=dur.map(function(d){return d*CFG.reels.turboFactor});
-  var sus=CFG.suspense.enabled?GH.detect(GH.gridFrom(targets,GH.strips),{mode:o.mode}):null;
-  if(sus){
-    var extra=st.turbo?CFG.suspense.revealMs*CFG.reels.turboFactor:CFG.suspense.revealMs;
-    dur[RC-1]=Math.max(dur[RC-1],dur[RC-2]+extra);
-    try{GH.main.pulse(RC-1,'cresc')}catch(e){}
-    var s0=dur[RC-2],span=dur[RC-1]-s0,steps=CFG.suspense.steps;
-    for(var k=0;k<steps;k++){ (function(kk){setTimeout(function(){
-      GH.audio.suspense(kk,steps,sus);
-      var p=kk/(steps-1); GH.buzz(p<0.4?'suspense':(p<0.8?'suspenseMid':'suspenseHi'));
-    },s0+span*Math.pow((kk+1)/steps,1.8))})(k); }
-  }else if(o.mode!=='normal'){
-    dur[RC-1]+=st.turbo?CFG.reels.anticipationExtra*CFG.reels.turboFactor:CFG.reels.anticipationExtra;
-    try{GH.main.pulse(RC-1,'antic')}catch(e){}
-    setTimeout(function(){GH.audio.heart();GH.buzz('anticipation')},dur[RC-1]-700);
-  }
-  GH.audio.spin();
-  var done=0, finished=false;
-  function finish(){
-    if(finished)return; finished=true;
-    GH.reelCont.forEach(function(ct,ci){ GH.pos[ci]=targets[ci]; ct.y=-targets[ci]*CH; });
-    GH.main.endSmear();
-    GH.main.stopPulse(RC-1);
-    settle(o);
-  }
-  GH.reelCont.forEach(function(cont,i){
-    var cur=GH.pos[i]; if(!isFinite(cur))cur=GH.pos[i]=0;
-    var delta=((targets[i]-cur)%STRIPLEN+STRIPLEN)%STRIPLEN;
-    if(!isFinite(delta))delta=0;
-    GH.pos[i]=cur+STRIPLEN*2+delta;
-    GH.main.tweens.add({targets:cont,y:-GH.pos[i]*CH,duration:dur[i],ease:'Cubic.Out',
-      onComplete:function(){
-        if(finished)return;
-        GH.audio.stop(); GH.buzz(i===RC-1?'lastReel':'reelStop'); done++;
-        if(done===RC)finish();
-      }});
-  });
-  /* completion watchdog: heal NaN reels for display; force settle once every
-     reel has exceeded its duration + slack (covers Phaser tween NaN) */
-  var reelStart=Date.now(), maxDur=Math.max.apply(null,dur)+800;
-  var wd=setInterval(function(){
-    if(finished){ clearInterval(wd); return; }
-    GH.reelCont.forEach(function(ct,ci){ if(isNaN(ct.y)){ ct.y=-targets[ci]*CH; } });
-    if(Date.now()-reelStart>maxDur){ clearInterval(wd); finish(); }
-  },140);
+  GH.pendingSync={user:r.user,jack:r.jackpots,mode:mode};
+  GH.api.spin(o.targets,o);          /* server targets through the proven demo spin path */
+  var iv=setInterval(function(){ if(!GH.state.spinning){clearInterval(iv);busy=false;} },300);
 }
-
 function settle(o){
   busy=false;
   var st=GH.state;
