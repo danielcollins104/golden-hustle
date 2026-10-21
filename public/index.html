@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Golden Hustle — Street Royale · Engine v3 (Phaser)</title>
 <style>
-body{margin:0;background:#060314 url('assets/bg-night.jpg') center/cover no-repeat fixed;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+body{margin:0;background:#05030c url('assets/backdrop.jpg') center/cover no-repeat fixed;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
 </style>
 </head>
 <body>
@@ -111,7 +111,7 @@ body{margin:0;background:#060314 url('assets/bg-night.jpg') center/cover no-repe
 #dhx .fsbadge.show{display:block;animation:flash 1s infinite}
 #dhx .toast{position:absolute;left:50%;bottom:14px;transform:translateX(-50%) translateY(10px);background:rgba(16,12,4,.96);border:1px solid var(--frame);border-radius:999px;padding:6px 16px;font-size:12px;color:#ffe9b0;opacity:0;transition:all .3s;pointer-events:none;z-index:40;white-space:nowrap}
 #dhx .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-#dhx .overlay{position:absolute;inset:0;background:rgba(8,6,2,.92);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:30;border-radius:16px}
+#dhx .overlay{position:absolute;inset:0;background:linear-gradient(rgba(6,3,14,.93),rgba(6,3,14,.97)),url('assets/cabinet-hero.png') center/cover;backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;flex-direction:column;z-index:30;border-radius:16px}
 #dhx .overlay.show{display:flex}
 #dhx .overlay h2{margin:0 0 8px;font-size:24px;font-weight:500;font-style:italic;color:var(--gold);text-shadow:0 0 16px color-mix(in srgb,var(--gold) 60%,transparent)}
 #dhx .overlay p{margin:4px 0;color:#d8c79a;font-size:14px}
@@ -227,6 +227,7 @@ body{margin:0;background:#060314 url('assets/bg-night.jpg') center/cover no-repe
     <div class="spingroup"><button class="spin" id="spinBtn">⟳</button></div>
     <div class="baritem"><span class="lab">WIN</span><span class="val" id="winVal">$0</span></div>
     <button class="pill" id="autoBtn">Auto</button>
+    <button class="pill" id="curBtn" style="display:none">GC</button>
     <button class="barbtn" id="sndBtn" aria-label="sound"><span id="sndIcon"></span></button>
   </div>
   <div class="payhint" id="payhint"></div>
@@ -241,6 +242,38 @@ body{margin:0;background:#060314 url('assets/bg-night.jpg') center/cover no-repe
     <div class="setrow"><span class="sl">SOUND SCHEME</span><div class="schemes" id="schemeBtns"></div></div>
     <div class="setrow"><span class="sl">HAPTICS</span><button class="pill on" id="hapticBtn">On</button></div>
     <button class="cta" id="payClose">Close</button></div>
+  
+  <div class="overlay" id="authOverlay"><h2>SIGN IN</h2>
+    <p id="authMsg" style="min-height:18px"></p>
+    <input id="authEmail" placeholder="email" style="margin:4px;padding:8px;border-radius:8px;border:1px solid #4a3670;background:#170c2c;color:#fff;width:200px">
+    <input id="authPass" type="password" placeholder="password (min 6)" style="margin:4px;padding:8px;border-radius:8px;border:1px solid #4a3670;background:#170c2c;color:#fff;width:200px">
+    <div style="display:flex;gap:10px;margin-top:10px"><button class="cta" id="loginBtn">Sign in</button><button class="cta" id="signupBtn">Create account</button></div>
+  </div>
+  <div class="overlay" id="amoeOverlay"><h2>FREE SC ENTRY</h2><p>No purchase necessary — official sweepstakes rules apply.</p>
+    <input id="amName" placeholder="full name" style="margin:3px;padding:7px;border-radius:8px;border:1px solid #4a3670;background:#170c2c;color:#fff;width:220px">
+    <input id="amAddr" placeholder="street address" style="margin:3px;padding:7px;border-radius:8px;border:1px solid #4a3670;background:#170c2c;color:#fff;width:220px">
+    <input id="amCity" placeholder="city" style="margin:3px;padding:7px;border-radius:8px;border:1px solid #4a3670;background:#170c2c;color:#fff;width:220px">
+    <input id="amState" placeholder="state" style="margin:3px;padding:7px;border-radius:8px;border:1px solid #4a3670;background:#170c2c;color:#fff;width:104px">
+    <input id="amZip" placeholder="zip" style="margin:3px;padding:7px;border-radius:8px;border:1px solid #4a3670;background:#170c2c;color:#fff;width:104px">
+    <p id="amMsg" style="min-height:18px"></p>
+    <div style="display:flex;gap:10px;margin-top:6px"><button class="cta" id="amSubmit">Request free SC</button><button class="cta" id="amClose">Close</button></div>
+  </div>
+  <div class="overlay" id="redeemOverlay"><h2>REDEEM SC</h2><p>1.00 SC = $1.00 USD · minimum $10.00 · KYC required before payout</p>
+    <input id="rdAmt" placeholder="amount (SC)" style="margin:4px;padding:8px;border-radius:8px;border:1px solid #4a3670;background:#170c2c;color:#fff;width:160px">
+    <p id="rdMsg" style="min-height:18px"></p>
+    <div style="display:flex;gap:10px;margin-top:6px"><button class="cta" id="rdSubmit">Request redemption</button><button class="cta" id="rdClose">Close</button></div>
+  </div>
+  <div class="overlay" id="rulesOverlay"><h2>OFFICIAL RULES</h2>
+    <div style="max-width:420px;max-height:300px;overflow:auto;font-size:12px;color:#d8c79a;padding:0 18px;text-align:left">
+      <p>1. NO PURCHASE NECESSARY. A purchase does not improve odds.</p>
+      <p>2. Open to legal residents of permitted jurisdictions, 18+ (or older where required). Void where prohibited. Washington State and other excluded jurisdictions may not participate.</p>
+      <p>3. Sweeps Coins (SC) are promotional entries with no purchase price. SC is available free via this form, daily login grants, and promotional offers.</p>
+      <p>4. SC gameplay outcomes are determined by chance. SC winnings may be redeemed for cash prizes at 1.00 SC = $1.00 USD, subject to identity verification.</p>
+      <p>5. One account per person. Identity verification required before redemption. Fraudulent entries are void.</p>
+      <p>6. THIS IS A REFERENCE IMPLEMENTATION — replace with counsel-approved official rules before any public launch.</p>
+    </div>
+    <button class="cta" id="rulesClose" style="margin-top:12px">Close</button>
+  </div>
   <div class="overlay" id="brokeOverlay"><h2 id="brokeTitle"></h2><p id="brokeSub"></p><button class="cta" id="refillBtn"></button></div>
   <div class="toast" id="toast"></div>
 </div>
@@ -248,6 +281,7 @@ body{margin:0;background:#060314 url('assets/bg-night.jpg') center/cover no-repe
 
 <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
 <script src="js/config.js"></script>
+<script src="js/net.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/game.js"></script>
