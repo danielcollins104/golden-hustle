@@ -205,7 +205,8 @@ MainScene.prototype={
   },
   update:function(){
     for(var ci2=0;ci2<GH.reelCont.length;ci2++){ var ct2=GH.reelCont[ci2];
-      if(isNaN(ct2.y)){ var p2=isFinite(GH.pos[ci2])?GH.pos[ci2]:0; ct2.y=-p2*GH.CH; } }
+      if(!isFinite(GH.pos[ci2]))GH.pos[ci2]=0;
+      if(isNaN(ct2.y)){ ct2.y=-GH.pos[ci2]*GH.CH; } }
     if(!GH.state||!GH.state.spinning)return;
     for(var i=0;i<RC;i++){
       var cont=GH.reelCont[i], y=cont.y;
