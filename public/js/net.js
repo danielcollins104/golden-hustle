@@ -57,7 +57,7 @@ async function netSpin(){
   if(sus){
     var extra=st.turbo?CFG.suspense.revealMs*CFG.reels.turboFactor:CFG.suspense.revealMs;
     dur[RC-1]=Math.max(dur[RC-1],dur[RC-2]+extra);
-    GH.main.pulse(RC-1,'cresc');
+    try{GH.main.pulse(RC-1,'cresc')}catch(e){}
     var s0=dur[RC-2],span=dur[RC-1]-s0,steps=CFG.suspense.steps;
     for(var k=0;k<steps;k++){ (function(kk){setTimeout(function(){
       GH.audio.suspense(kk,steps,sus);
@@ -65,7 +65,7 @@ async function netSpin(){
     },s0+span*Math.pow((kk+1)/steps,1.8))})(k); }
   }else if(o.mode!=='normal'){
     dur[RC-1]+=st.turbo?CFG.reels.anticipationExtra*CFG.reels.turboFactor:CFG.reels.anticipationExtra;
-    GH.main.pulse(RC-1,'antic');
+    try{GH.main.pulse(RC-1,'antic')}catch(e){}
     setTimeout(function(){GH.audio.heart();GH.buzz('anticipation')},dur[RC-1]-700);
   }
   GH.audio.spin();
@@ -77,17 +77,26 @@ async function netSpin(){
     GH.main.stopPulse(RC-1);
     settle(o);
   }
+  function animateReel(i2,d2,onDone){
+    var cont=GH.reelCont[i2], from=cont.y, to=-GH.pos[i2]*CH, t0=performance.now();
+    function frame(t){
+      if(finished)return;
+      var k=Math.min(1,(t-t0)/d2), e2=1-Math.pow(1-k,3);
+      cont.y=from+(to-from)*e2;
+      if(k<1){ requestAnimationFrame(frame); } else { cont.y=to; onDone(); }
+    }
+    requestAnimationFrame(frame);
+  }
   GH.reelCont.forEach(function(cont,i){
     var cur=GH.pos[i];
     var delta=((targets[i]-cur)%STRIPLEN+STRIPLEN)%STRIPLEN;
     if(!isFinite(delta))delta=0;
     GH.pos[i]=cur+STRIPLEN*2+delta;
-    GH.main.tweens.add({targets:cont,y:-GH.pos[i]*CH,duration:dur[i],ease:'Cubic.Out',
-      onComplete:function(){
-        if(finished)return;
-        GH.audio.stop(); GH.buzz(i===RC-1?'lastReel':'reelStop'); done++;
-        if(done===RC)finish();
-      }});
+    animateReel(i,dur[i],function(){
+      if(finished)return;
+      GH.audio.stop(); GH.buzz(i===RC-1?'lastReel':'reelStop'); done++;
+      if(done===RC)finish();
+    });
   });
   /* NaN watchdog: if Phaser loses a reel mid-tween, snap it to its server target */
   var wd=setInterval(function(){
