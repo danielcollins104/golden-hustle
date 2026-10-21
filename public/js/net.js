@@ -78,7 +78,7 @@ async function netSpin(){
     settle(o);
   }
   GH.reelCont.forEach(function(cont,i){
-    var cur=GH.pos[i];
+    var cur=GH.pos[i]; if(!isFinite(cur))cur=GH.pos[i]=0;
     var delta=((targets[i]-cur)%STRIPLEN+STRIPLEN)%STRIPLEN;
     if(!isFinite(delta))delta=0;
     GH.pos[i]=cur+STRIPLEN*2+delta;
