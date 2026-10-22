@@ -45,8 +45,14 @@ async function netSpin(){
   catch(e){ busy=false; GH.api.toast(e.message); return }
   var o=r.outcome;
   GH.pendingSync={user:r.user,jack:r.jackpots,mode:mode};
-  GH.api.spin(o.targets,o);          /* server targets through the proven demo spin path */
-  var iv=setInterval(function(){ if(!GH.state.spinning){clearInterval(iv);busy=false;} },300);
+  try{ GH.api.spin(o.targets,o); }   /* server targets through the proven demo spin path */
+  catch(e){ GH.state.spinning=false; busy=false; GH.api.toast('ERR: '+String(e&&e.message||e).slice(0,70)); }
+  var t0=Date.now();
+  var iv=setInterval(function(){
+    if(!GH.state.spinning){ clearInterval(iv); busy=false; }
+    else if(Date.now()-t0>9000){ GH.state.spinning=false; busy=false; clearInterval(iv);
+      GH.api.toast('Recovered a stuck spin'); }
+  },300);
 }
 function settle(o){
   busy=false;
