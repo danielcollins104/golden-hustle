@@ -683,8 +683,7 @@ setTimeout(function(){
   var cv=rw.querySelector('canvas'); if(!cv)return;
   rw.style.overflow='hidden';
   rw.style.height=(cv.offsetHeight+12)+'px';
-  cv.style.top='6px'; cv.style.left='50%'; cv.style.transform='translateX(-50%)';
-  cv.style.marginLeft=(-cv.offsetWidth/2)+'px';
+  cv.style.top='6px'; cv.style.left='50%'; cv.style.transform='translateX(-50%)'; cv.style.marginLeft='0';
 },800);
 
 /* exposed for net.js (sweepstakes mode) */
