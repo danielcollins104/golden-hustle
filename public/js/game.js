@@ -641,7 +641,13 @@ setInterval(function(){
 /* ── fit-to-screen (phones): zoom scales layout, not just visuals ── */
 var fitEl=document.getElementById('dhx');
 var ZOOM_OK=false;
-try{ ZOOM_OK=CSS.supports&&CSS.supports('zoom','1'); }catch(e){}
+try{
+  var zp=document.createElement('div');
+  zp.style.cssText='position:absolute;visibility:hidden;height:80px;width:80px;zoom:2;pointer-events:none';
+  document.body.appendChild(zp);
+  ZOOM_OK=Math.abs(zp.getBoundingClientRect().height-160)<2;
+  zp.remove();
+}catch(e){}
 function fitScreen(){
   fitEl.style.zoom=''; fitEl.style.transform='';
   var fw=fitEl.offsetWidth, fh=fitEl.offsetHeight;
