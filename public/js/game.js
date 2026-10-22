@@ -353,6 +353,7 @@ function bigCelebration(text,win){
 
 function applyServer(o){
   var st=GH.state;
+  if(typeof o.streak==='number') st.streak=o.streak;
   st.lastWin=o.win;
   if(o.win>st.biggest)st.biggest=o.win;
   st.hype=Math.min(CFG.hype.max,st.hype+CFG.hype.perSpin+(o.win>0?CFG.hype.perWin:0));
