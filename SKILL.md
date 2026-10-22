@@ -35,3 +35,11 @@ Colored identity ring: hsl(hue,85,60), 5px, blurred glow copy beneath.
 Subject: luminance-keyed alpha ((L-12)*4) from pure-black-source art.
 Outline: SILHOUETTE-ONLY — rim mask = FIND_EDGES(>80) MULTIPLIED BY (alpha minus MinFilter(11)-eroded alpha). Soft halo 20% + rim line 120-alpha white. NO internal edge outlining.
 Quantize 192 colors FASTOCTREE. Size 192px. Display 68px tiles.
+
+
+## USER-GENERATED art pipeline (v2.3 FINAL, user-approved)
+User art arrives perfect — MINIMAL processing only:
+1. Resize 192. Alpha = (L-8)*14 clamped, blur 1.2 — fully opaque subject, fades only at true-black edge.
+2. Composite onto dark_field(symbol hue) + colored ring. NOTHING else.
+NO outlines, NO detint, NO rims — the generator's look is the look.
+(Pack art with messy edges keeps the v2.1 outline recipe; user art never gets it.)
