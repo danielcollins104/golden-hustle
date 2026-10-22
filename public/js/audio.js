@@ -26,6 +26,26 @@ function playSfx(name,vol,rate){
   return true;
 }
 
+/* ── industry music bed + win sting (Kevin MacLeod, incompetech.com, CC BY 3.0) ── */
+var musicBed=null, stingEl=null;
+function ensureMusic(){
+  if(musicBed||!(window.Audio||window.HTMLAudioElement))return;
+  try{
+    musicBed=new Audio((GH.SFX64&&'assets/music/bed.mp3')||'assets/music/bed.mp3');
+    musicBed.loop=true; musicBed.volume=0.30*CFG.audio.volume; musicBed.preload='auto';
+    stingEl=new Audio('assets/music/sting.mp3'); stingEl.volume=0.55*CFG.audio.volume; stingEl.preload='auto';
+  }catch(e){}
+}
+GH.audio.syncMusic=function(){
+  if(!musicBed)return;
+  if(GH.state.muted||!CFG.audio.enabled||!CFG.audio.music){ musicBed.pause(); return; }
+  var p=musicBed.play(); if(p&&p.catch)p.catch(function(){});
+};
+GH.audio.sting=function(){
+  if(!stingEl||GH.state.muted||!CFG.audio.enabled)return;
+  try{ stingEl.currentTime=0; var p=stingEl.play(); if(p&&p.catch)p.catch(function(){}); }catch(e){}
+};
+
 function tone(f,d,type,v,when,slide){
   if(GH.state.muted||!CFG.audio.enabled)return; var a=ac(); if(!a)return;
   var o=a.createOscillator(),g=a.createGain(); o.type=type||'square';
