@@ -640,13 +640,22 @@ setInterval(function(){
 
 /* ── fit-to-screen (phones): zoom scales layout, not just visuals ── */
 var fitEl=document.getElementById('dhx');
+var ZOOM_OK=false;
+try{ ZOOM_OK=CSS.supports&&CSS.supports('zoom','1'); }catch(e){}
 function fitScreen(){
-  fitEl.style.zoom=1;
+  fitEl.style.zoom=''; fitEl.style.transform='';
   var fw=fitEl.offsetWidth, fh=fitEl.offsetHeight;
   var land=window.innerWidth>window.innerHeight;
   var s=land? Math.min(1,(window.innerWidth-8)/fw,(window.innerHeight-8)/fh)
             : Math.min(1,(window.innerWidth-4)/fw);
-  fitEl.style.zoom=s;
+  if(ZOOM_OK){ fitEl.style.zoom=s; }
+  else{
+    fitEl.style.transform='scale('+s+')';
+    fitEl.style.transformOrigin='top left';
+    fitEl.style.margin='0 auto';
+    document.documentElement.style.overflowX='hidden';
+    document.body.style.overflowX='hidden';
+  }
 }
 var __lw=window.innerWidth,__lh=window.innerHeight;
 window.addEventListener('resize',function(){
@@ -667,9 +676,9 @@ setTimeout(function(){
   var rw=document.getElementById('reelwrap'); if(!rw)return;
   var cv=rw.querySelector('canvas'); if(!cv)return;
   rw.style.overflow='hidden';
-  var h=cv.getBoundingClientRect().height/(parseFloat(document.getElementById('dhx').style.zoom)||1);
-  rw.style.height=Math.ceil(h+12)+'px';
+  rw.style.height=(cv.offsetHeight+12)+'px';
   cv.style.top='6px'; cv.style.left='50%'; cv.style.transform='translateX(-50%)';
+  cv.style.marginLeft=(-cv.offsetWidth/2)+'px';
 },800);
 
 /* exposed for net.js (sweepstakes mode) */
