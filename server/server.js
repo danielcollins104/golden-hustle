@@ -86,7 +86,13 @@ app.post('/api/spin',auth,(req,res)=>{
   }
   db.jackpots.mini+=bet*JP_GROWTH.mini; db.jackpots.major+=bet*JP_GROWTH.major; db.jackpots.grand+=bet*JP_GROWTH.grand;
   const o=engine.spinOutcome(bet);
-  let win=o.total, wheelPrize=null;
+  /* streak ladder + free-spin multiplier — server-side so balance matches UI */
+  u.streak=u.streak||0;
+  const LADDER=[1,1,2,2,3,4,5,6,8,10];
+  const mult=LADDER[Math.min(u.streak,9)];
+  const fsM=inFS?(u.fsMult||1):1;
+  o.streak=u.streak; o.mult=mult; o.fsM=fsM;
+  let win=o.total*mult*fsM, wheelPrize=null;
   if(o.wheel){
     const r=Math.random(); let acc=0;
     for(const [k,w] of JP_WHEEL){ acc+=w; if(r<acc){ wheelPrize={ key:k, amount:Math.round(db.jackpots[k]) }; db.jackpots[k]=JP_START[k]; win+=wheelPrize.amount; break; } }
@@ -94,6 +100,7 @@ app.post('/api/spin',auth,(req,res)=>{
   let fsGrant=null;
   if(o.scatters>=4&&!o.wheel){ const t=o.scatters>=5?{n:10,m:3}:{n:6,m:2}; u[fsKey]+=t.n; if(t.m>u.fsMult)u.fsMult=t.m; fsGrant=t; }
   win+=o.bonusAward;
+  if(win>=bet) u.streak++; else if(win===0) u.streak=0;
   if(mode==='sc') u.sc=+(u.sc+win).toFixed(2); else u.gc+=win;
   save();
   res.json({ ok:true, mode, bet, inFS,
