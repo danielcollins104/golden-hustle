@@ -36,15 +36,17 @@ function ensureMusic(){
     stingEl=new Audio('assets/music/sting.mp3'); stingEl.volume=0.55*CFG.audio.volume; stingEl.preload='auto';
   }catch(e){}
 }
-GH.audio.syncMusic=function(){
+function syncMusic(){
   if(!musicBed)return;
-  if(GH.state.muted||!CFG.audio.enabled||!CFG.audio.music){ musicBed.pause(); return; }
-  var p=musicBed.play(); if(p&&p.catch)p.catch(function(){});
-};
-GH.audio.sting=function(){
+  try{
+    if(GH.state.muted||!CFG.audio.enabled||!CFG.audio.music){ musicBed.pause(); return; }
+    var p=musicBed.play(); if(p&&p.catch)p.catch(function(){});
+  }catch(e){}
+}
+function sting(){
   if(!stingEl||GH.state.muted||!CFG.audio.enabled)return;
   try{ stingEl.currentTime=0; var p=stingEl.play(); if(p&&p.catch)p.catch(function(){}); }catch(e){}
-};
+}
 
 function tone(f,d,type,v,when,slide){
   if(GH.state.muted||!CFG.audio.enabled)return; var a=ac(); if(!a)return;
