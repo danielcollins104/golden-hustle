@@ -662,6 +662,15 @@ var forceReelBox=function(){ var rw=document.getElementById('reelwrap');
 window.addEventListener('resize',forceReelBox);
 window.addEventListener('orientationchange',function(){setTimeout(forceReelBox,250)});
 forceReelBox();
+/* geometry enforcer: clamp the reel window to the actual rendered canvas */
+setTimeout(function(){
+  var rw=document.getElementById('reelwrap'); if(!rw)return;
+  var cv=rw.querySelector('canvas'); if(!cv)return;
+  rw.style.overflow='hidden';
+  var h=cv.getBoundingClientRect().height/(parseFloat(document.getElementById('dhx').style.zoom)||1);
+  rw.style.height=Math.ceil(h+12)+'px';
+  cv.style.top='6px'; cv.style.left='50%'; cv.style.transform='translateX(-50%)';
+},800);
 
 /* exposed for net.js (sweepstakes mode) */
 GH.api={spin:spin,updateUI:updateUI,award:award,fmt:fmt,fmt2:fmt2,toast:toast,showBanner:showBanner,shake:shake,
