@@ -241,6 +241,7 @@ MainScene.prototype={
     });
   },
   clearWin:function(){
+    var sv=document.getElementById('symAnim'); if(sv)sv.style.display='none';
     GH.lineGfx.clear();
     GH.winFx.forEach(function(f){f.destroy()}); GH.winFx=[];
   },
@@ -322,6 +323,11 @@ function celebrate(win,res){
   for(var i=0;i<CFG.celebrations.tiers.length;i++){if(ratio>=CFG.celebrations.tiers[i].minRatio){tier=CFG.celebrations.tiers[i];break}}
   if(!tier)return;
   GH.main.drawWinLines(res.lines);
+  var best=null,bestPay=-1;
+  res.lines.forEach(function(w){ var pp=(GH.SYM[w.sym]&&GH.SYM[w.sym].pay?GH.SYM[w.sym].pay[Math.min(w.count,5)]:0); if(pp>bestPay){bestPay=pp;best=w.sym} });
+  if(best){ var sv=document.getElementById('symAnim');
+    if(sv){ sv.src='assets/anim/symbols/'+GH.SYM[best].tex+'.mp4'; sv.style.display='block';
+      try{ sv.currentTime=0; var pp2=sv.play(); if(pp2&&pp2.catch)pp2.catch(function(){}); }catch(e){} } }
   GH.buzz(tier.buzz);
   switch(tier.fx){
     case 'monumental':GH.audio.fanfare();shake();rain(160);bigCelebration(tier.text,win);break;
