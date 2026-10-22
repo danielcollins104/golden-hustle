@@ -57,7 +57,8 @@ CFG.symbols.filter(function(s){return s.pay}).forEach(function(s){
 var schemeEls={};
 Object.keys(CFG.audio.schemes).forEach(function(k){
   var b=document.createElement('button'); b.className='pill'; b.textContent=CFG.audio.schemes[k].label;
-  b.addEventListener('click',function(){GH.state.scheme=k;GH.audio.ac();GH.startMusic();refreshSchemeUI();GH.audio.jiggle(4);GH.buzz('win');toast('Sound scheme: '+CFG.audio.schemes[k].label)});
+  b.addEventListener('click',function(){GH.state.scheme=k;GH.audio.ac();GH.startMusic();refreshSchemeUI();
+window.addEventListener('error',function(e){ try{ if(GH.api&&GH.api.toast&&e.message) GH.api.toast('ERR: '+e.message.slice(0,70)); }catch(_){ } });GH.audio.jiggle(4);GH.buzz('win');toast('Sound scheme: '+CFG.audio.schemes[k].label)});
   el.schemeBtns.appendChild(b); schemeEls[k]=b;
 });
 function refreshSchemeUI(){Object.keys(schemeEls).forEach(function(k){schemeEls[k].classList.toggle('on',k===GH.state.scheme)})}
