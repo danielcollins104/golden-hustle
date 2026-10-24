@@ -2,9 +2,10 @@
 (function(){
 var CFG=GH.CFG;
 var AC=null;
+document.addEventListener('pointerdown',function once(){ document.removeEventListener('pointerdown',once); ac(); },{once:true});
 function ac(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){} } if(AC&&AC.state==='suspended')AC.resume(); return AC; }
 /* ── real casino SFX (Kenney, CC0) with synth fallback ── */
-var SFX_DEFS={spin:'spin',stop:'stop',stopLast:'stopLast',coin:'coin',stack:'stack',click:'click'};
+var SFX_DEFS={spin:'spin',stop:'stop',stopLast:'stopLast',coin:'coin',stack:'stack',click:'click',coins:'coins',coins2:'coins2',clunk:'clunk',switch:'switch',uiclick:'uiclick'};
 var sfxBuf={}, sfxLoading=false;
 function loadSamples(){
   if(sfxLoading)return; sfxLoading=true;
@@ -32,7 +33,7 @@ function ensureMusic(){
   if(musicBed||!(window.Audio||window.HTMLAudioElement))return;
   try{
     musicBed=new Audio((GH.SFX64&&'assets/music/bed.mp3')||'assets/music/bed.mp3');
-    musicBed.loop=true; musicBed.volume=0.30*CFG.audio.volume; musicBed.preload='auto';
+    musicBed.loop=true; musicBed.volume=0.42*CFG.audio.volume; musicBed.preload='auto';
     stingEl=new Audio('assets/music/sting.mp3'); stingEl.volume=0.55*CFG.audio.volume; stingEl.preload='auto';
   }catch(e){}
 }
