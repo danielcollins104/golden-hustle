@@ -4,15 +4,15 @@ const crypto = require('crypto');
 const rnd = () => crypto.randomBytes(4).readUInt32BE(0) / 4294967296;
 
 const SYMBOLS = [
-  { key:'diamond', weight:1, wild:true,  pay:{3:10,4:24,5:96} },
-  { key:'rocket',  weight:2,             pay:{3:7,4:19,5:72} },
-  { key:'moon',    weight:2,             pay:{3:3,4:11,5:38}  },
-  { key:'ape',     weight:2,             pay:{3:3,4:10,5:29}  },
-  { key:'ufo',     weight:1,             pay:{3:3,4:7,5:19}  },
-  { key:'banana',  weight:3,             pay:{3:3,4:7,5:18}  },
-  { key:'dog',     weight:4,             pay:{3:2,4:3,5:11}  },
-  { key:'crash',   weight:4,             pay:{3:2,4:3,5:10}  },
-  { key:'poop',    weight:2,             pay:{3:3,4:10,5:29}  },
+  { key:'diamond', weight:1, wild:true,  pay:{3:7,4:18,5:70} },
+  { key:'rocket',  weight:2,             pay:{3:5,4:14,5:52} },
+  { key:'moon',    weight:2,             pay:{3:2,4:8,5:27}  },
+  { key:'ape',     weight:2,             pay:{3:2,4:7,5:21}  },
+  { key:'ufo',     weight:1,             pay:{3:2,4:5,5:14}  },
+  { key:'banana',  weight:3,             pay:{3:2,4:5,5:13}  },
+  { key:'dog',     weight:4,             pay:{3:1,4:2,5:8}  },
+  { key:'crash',   weight:4,             pay:{3:1,4:2,5:7}  },
+  { key:'poop',    weight:2,             pay:{3:2,4:7,5:21}  },
   { key:'star',    weight:2,             pay:null              },
 ];
 const LINES = [[1,1,1,1,1],[0,0,0,0,0],[2,2,2,2,2],[0,1,2,1,0],[2,1,0,1,2]];
