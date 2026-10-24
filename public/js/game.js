@@ -683,12 +683,12 @@ forceReelBox();
 function enforceReelBox(){
   var rw=document.getElementById('reelwrap'); if(!rw)return;
   var cv=rw.querySelector('canvas'); if(!cv)return;
-  var ih=cv.getAttribute('height'), iw=cv.getAttribute('width');
-  if(ih){ cv.style.height=ih+'px'; cv.style.width=iw+'px'; }
+  /* in-flow layout: reelwrap sizes itself from the canvas — no pixel math */
+  cv.style.position='relative';
+  cv.style.left='auto'; cv.style.top='auto'; cv.style.transform='none';
+  cv.style.margin='0 auto'; cv.style.display='block';
   rw.style.overflow='hidden';
-  rw.style.height=(parseInt(ih||cv.offsetHeight)+12)+'px';
-  cv.style.top='6px'; cv.style.left='50%'; cv.style.marginLeft='0';
-  cv.style.transform='translateX(-50%)';
+  rw.style.height='auto';
 }
 [800,2000,4000,8000].forEach(function(t){ setTimeout(enforceReelBox,t); });
 
