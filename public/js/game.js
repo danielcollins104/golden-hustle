@@ -611,8 +611,8 @@ el.spinBtn.addEventListener('click',function(){
   if(GH.state.auto){GH.state.auto=false;el.autoBtn.classList.remove('on')}
   spin();
 });
-el.betUp.addEventListener('click',function(){if(GH.state.spinning||GH.state.fs>0)return;GH.state.bet=Math.min(CFG.economy.betMax,GH.state.bet+CFG.economy.betStep);updateUI()});
-el.betDown.addEventListener('click',function(){if(GH.state.spinning||GH.state.fs>0)return;GH.state.bet=Math.max(CFG.economy.betMin,GH.state.bet-CFG.economy.betStep);updateUI()});
+el.betUp.addEventListener('click',function(){if(GH.audio.click)GH.audio.click();if(GH.state.spinning||GH.state.fs>0)return;GH.state.bet=Math.min(CFG.economy.betMax,GH.state.bet+CFG.economy.betStep);updateUI()});
+el.betDown.addEventListener('click',function(){if(GH.audio.click)GH.audio.click();if(GH.state.spinning||GH.state.fs>0)return;GH.state.bet=Math.max(CFG.economy.betMin,GH.state.bet-CFG.economy.betStep);updateUI()});
 el.turboBtn.addEventListener('click',function(){GH.state.turbo=!GH.state.turbo;el.turboBtn.classList.toggle('on',GH.state.turbo)});
 el.autoBtn.addEventListener('click',function(){
   GH.state.auto=!GH.state.auto; el.autoBtn.classList.toggle('on',GH.state.auto);
