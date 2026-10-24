@@ -680,13 +680,17 @@ window.addEventListener('resize',forceReelBox);
 window.addEventListener('orientationchange',function(){setTimeout(forceReelBox,250)});
 forceReelBox();
 /* geometry enforcer: clamp the reel window to the actual rendered canvas */
-setTimeout(function(){
+function enforceReelBox(){
   var rw=document.getElementById('reelwrap'); if(!rw)return;
   var cv=rw.querySelector('canvas'); if(!cv)return;
+  var ih=cv.getAttribute('height'), iw=cv.getAttribute('width');
+  if(ih){ cv.style.height=ih+'px'; cv.style.width=iw+'px'; }
   rw.style.overflow='hidden';
-  rw.style.height=(cv.offsetHeight+12)+'px';
-  cv.style.top='6px'; cv.style.left='50%'; cv.style.transform='translateX(-50%)'; cv.style.marginLeft='0';
-},800);
+  rw.style.height=(parseInt(ih||cv.offsetHeight)+12)+'px';
+  cv.style.top='6px'; cv.style.left='50%'; cv.style.marginLeft='0';
+  cv.style.transform='translateX(-50%)';
+}
+[800,2000,4000,8000].forEach(function(t){ setTimeout(enforceReelBox,t); });
 
 /* exposed for net.js (sweepstakes mode) */
 GH.api={spin:spin,updateUI:updateUI,award:award,fmt:fmt,fmt2:fmt2,toast:toast,showBanner:showBanner,shake:shake,
