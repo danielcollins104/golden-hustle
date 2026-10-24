@@ -15,6 +15,9 @@ const WELCOME = { gc: 5000, sc: 2.00 };
 const DAILY_SC = 1.00;
 const AMOE_GRANT = 2.00, AMOE_COOLDOWN_DAYS = 7;
 const REDEEM_MIN = 10.00;
+const WIN_CAP = parseFloat(process.env.WIN_CAP || '50000');      // max credits paid on one spin
+const MAX_MULT = 25;                                              // streak x FS multiplier ceiling
+const REDEEM_DAILY_MAX = parseFloat(process.env.REDEEM_DAILY_MAX || '1000');
 const BET = { min:2, max:200, step:10 };
 const JP_START = { mini:250, major:2500, grand:25000 };
 const JP_GROWTH = { mini:0.012, major:0.03, grand:0.08 };
@@ -91,8 +94,9 @@ app.post('/api/spin',auth,(req,res)=>{
   const LADDER=[1,1,2,2,3,4,5,6,8,10];
   const mult=LADDER[Math.min(u.streak,9)];
   const fsM=inFS?(u.fsMult||1):1;
-  o.streak=u.streak; o.mult=mult; o.fsM=fsM;
-  let win=o.total*mult*fsM, wheelPrize=null;
+  const cappedMult=Math.min(mult*fsM, MAX_MULT);
+  o.streak=u.streak; o.mult=cappedMult; o.fsM=fsM;
+  let win=Math.min(o.total*cappedMult, WIN_CAP), wheelPrize=null;
   if(o.wheel){
     const r=Math.random(); let acc=0;
     for(const [k,w] of JP_WHEEL){ acc+=w; if(r<acc){ wheelPrize={ key:k, amount:Math.round(db.jackpots[k]) }; db.jackpots[k]=JP_START[k]; win+=wheelPrize.amount; break; } }
@@ -136,6 +140,9 @@ app.post('/api/amoe',auth,(req,res)=>{
 app.post('/api/redeem',auth,(req,res)=>{
   const amt=parseFloat((req.body&&req.body.amount)||0);
   if(!(amt>=REDEEM_MIN)) return res.status(400).json({error:`minimum redemption $${REDEEM_MIN.toFixed(2)}`});
+  const dayStart=new Date(); dayStart.setHours(0,0,0,0);
+  const today=db.redemptions.filter(r=>r.uid===req.uid&&r.at>=dayStart.getTime()).reduce((a,r)=>a+r.amount,0);
+  if(today+amt>REDEEM_DAILY_MAX) return res.status(400).json({error:`daily redemption cap $${REDEEM_DAILY_MAX.toFixed(2)}`});
   if(amt>req.user.sc) return res.status(400).json({error:'insufficient SC'});
   req.user.sc=+(req.user.sc-amt).toFixed(2);
   const id=crypto.randomBytes(4).toString('hex');
